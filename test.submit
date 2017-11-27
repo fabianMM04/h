@@ -1,0 +1,5 @@
+executable = /root/Documentos/t/test.py
+universe = vanilla
+log = /root/Documentos/t/test.log
+output = /root/Documentos/t/test.output
+Queue
