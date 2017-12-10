@@ -1,5 +1,5 @@
-executable = /root/Documentos/t/test.py
+executable = test.py
 universe = vanilla
-log = /root/Documentos/t/test.log
-output = /root/Documentos/t/test.output
+log = /opt/env/h/test1.txt
+output = /opt/env/h/test1.out
 Queue
