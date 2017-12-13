@@ -77,10 +77,9 @@ def allowed_file(filename):
 @app.route('/upload', methods=['POST'])
 def upload():
   # Get the name of the uploaded files
-  path = request.form['path']
   uploaded_files = request.files.getlist("file[]")
-  print("nombre upload: ", uploaded_files)
-  filenames = []
+  
+filenames = []
   for file in uploaded_files:
     # Check if the file is one of the allowed types/extensions
     if file and allowed_file(file.filename):
@@ -88,15 +87,13 @@ def upload():
       filename = secure_filename(file.filename)
       # Move the file form the temporal folder to the upload
       # folder we setup
-      if not os.path.exists('/opt/env/h/'+path):
-        os.makedirs('/opt/env/h/'+path)
-      file.save(os.path.join(app.config['UPLOAD_FOLDER']+path,filename))
+      file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
       # Save the filename into a list, we'll use it later
       filenames.append(filename)
       # Redirect the user to the uploaded_file route, which
       # will basicaly show on the browser the uploaded file
   # Load an html page with a link to each uploaded file
-  return jsonify({"file": filenames, "path": path})
+      return jsonify({"file": filenames})
 
 if __name__ == '__main__':
     app.debug = True
