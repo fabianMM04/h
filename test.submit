@@ -1,5 +1,5 @@
 executable = test.py
 universe = vanilla
-log = /opt/env/h/test1.txt
+log = /opt/env/h/test1.log
 output = /opt/env/h/test1.out
 Queue
