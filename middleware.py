@@ -2,6 +2,7 @@ from flask import Flask, jsonify,  render_template, request, redirect, url_for, 
 from werkzeug import secure_filename
 import subprocess
 import os
+import wget
 from factory import Factory
  
 app = Flask(__name__)
@@ -97,6 +98,19 @@ def upload():
       # will basicaly show on the browser the uploaded file
   # Load an html page with a link to each uploaded file
   return jsonify({"file": filenames, "path": path})
+
+@app.route('/showFile/<string:path>/<string:path2>')
+def uploaded_file(path, path2):
+    print(path,"/", path2)
+    return jsonify({"files": os.listdir('/opt/env/h/'+path+"/"+path2)})
+
+@app.route('/download/<string:path>/<string:path2>/<string:filename>', methods=['POST'])
+def download(path, path2, filename):
+    print('/opt/env/h/'+path+"/"+path2+"/"+filename)
+    uploads = os.path.join('/opt/env/h/'+path, path2)
+    print("upload:", uploads)
+    return send_from_directory(directory=uploads, filename=filename, as_attachment= True)
+
 
 if __name__ == '__main__':
     app.debug = True
