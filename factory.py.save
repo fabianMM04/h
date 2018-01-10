@@ -15,4 +15,4 @@ class Factory:
 #a = Factory.get_vesion(Factory,"8.0.5")
 #d_a = a.submit("test.submit")
 #s = d_a.decode()
-#print((s))
+print((s))

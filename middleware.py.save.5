@@ -1,7 +1,7 @@
 from flask import Flask, jsonify,  render_template, request, redirect, url_for, send_from_directory, send_file, redirect, g, abort
 from werkzeug import secure_filename
 import subprocess
-import os, shutil
+import os
 import wget
 from factory import Factory
  
@@ -67,7 +67,7 @@ def log(log, version):
 
 app.config['UPLOAD_FOLDER'] = ''
 # These are the extension that we are accepting to be uploaded
-app.config['ALLOWED_EXTENSIONS'] = set(['txt', 'xlsx', 'xls', 'csv', 'py','cpp', 'h', 'jar', 'jpg', 'jpeg', 'submit'])
+app.config['ALLOWED_EXTENSIONS'] = set(['txt', 'xlsx', 'xls', 'csv', 'py','cpp', 'h', 'jar'])
 
 # For a given file, return whether it's an allowed type or not
 def allowed_file(filename):
@@ -75,10 +75,10 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
 
 # Route that will process the file upload
-@app.route('/upload/<string:path1>/<string:path2>', methods=['POST'])
-def upload(path1, path2):
+@app.route('/upload', methods=['POST'])
+def upload():
   # Get the name of the uploaded files
-  path = path1+'/'+path2
+  path = request.form['path']
   uploaded_files = request.files.getlist("file[]")
   print("nombre upload: ", uploaded_files)
   filenames = []
@@ -91,7 +91,6 @@ def upload(path1, path2):
       # folder we setup
       if not os.path.exists('/opt/env/h/'+path):
         os.makedirs('/opt/env/h/'+path)
-        print("crea carpeta", flush=True)
       file.save(os.path.join(app.config['UPLOAD_FOLDER']+path,filename))
       # Save the filename into a list, we'll use it later
       filenames.append(filename)
@@ -103,40 +102,22 @@ def upload(path1, path2):
 @app.route('/showFile/<string:path>/<string:path2>')
 def uploaded_file(path, path2):
     print(path,"/", path2)
-    if not os.path.exists('/opt/env/h/'+path+"/"+path2):
-        return jsonify({"files": "File not found"})
-    else:
-        return jsonify({"files": os.listdir('/opt/env/h/'+path+"/"+path2)})
-
-@app.route('/delete/<string:path>/<string:path2>')
-def delete_dir(path, path2):
-    print(path,"/", path2)
-    if os.path.isdir('/opt/env/h/'+path+"/"+path2):
-        shutil.rmtree('/opt/env/h/'+path+"/"+path2)
-        return jsonify({"directory": "Directory deleted "})
-    else:
-        return jsonify({"directory": "Directory not found"})
-
-@app.route('/delete/<string:path>/<string:path2>/<string:filename>')
-def delete_file(path, path2, filename):
-    print(path,"/", path2,"/", filename)
-    if os.path.exists('/opt/env/h/'+path+"/"+path2+"/"+filename):
-        os.remove('/opt/env/h/'+path+"/"+path2+"/"+filename)
-        return jsonify({"file": "File deleted "})
-    else:
-        return jsonify({"file": "File not found"})
-
+    return jsonify({"files": os.listdir('/opt/env/h/'+path+"/"+path2)})
 
 @app.route('/download/<string:path>/<string:path2>/<string:filename>', methods=['GET', 'POST'])
-def hola(path, path2, filename):
+def download(path, path2, filename):
+    print('/opt/env/h/'+path+"/"+path2+"/"+filename)
+    uploads = os.path.join('/opt/env/h/'+path, path2)
+    print("upload:", uploads)
+    return send_from_directory(uploads, filename, attachment_filename=filename , as_attachment=True)
+
+@app.route('/hola', methods=['GET'])
+def h():
     if request.method == 'GET':
         return render_template("download.html")
-    if request.method == 'POST':
-        print('/opt/env/h/'+path+"/"+path2+"/"+filename)
-        uploads = '/opt/env/h/'+path+"/"+path2+"/"+filename
-        print("upload:", uploads)
-        return send_file(uploads, as_attachment=True)
 
+@app.route('/d/<string:path>/<string:path2>/<:filename>', methods=['POST'])
+def hola(path, path2, filename):
 
 if __name__ == '__main__':
     app.debug = True
