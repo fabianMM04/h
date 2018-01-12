@@ -36,8 +36,9 @@ def condor_q(version):
     return jsonify({"queue": out})
 
 
-@app.route('/condor/<string:version>/ejecucion/<string:submit>')
-def condor_submit(submit, version):
+@app.route('/condor/<string:version>/ejecucion/<string:path>/<string:path2>/<string:submit>')
+def condor_submit(submit, version, path, path2):
+    os.chdir('/opt/env/h/'+path+"/"+path2)
     a = Factory.get_vesion(Factory, version)
     if a != None:
         out = (a.submit(submit)).decode()
@@ -92,7 +93,7 @@ def upload(path1, path2):
       if not os.path.exists('/opt/env/h/'+path):
         os.makedirs('/opt/env/h/'+path)
         print("crea carpeta", flush=True)
-      file.save(os.path.join(app.config['UPLOAD_FOLDER']+path,filename))
+      file.save(os.path.join('/opt/env/h/'+path,filename))
       # Save the filename into a list, we'll use it later
       filenames.append(filename)
       # Redirect the user to the uploaded_file route, which
@@ -129,8 +130,6 @@ def delete_file(path, path2, filename):
 
 @app.route('/download/<string:path>/<string:path2>/<string:filename>', methods=['GET', 'POST'])
 def hola(path, path2, filename):
-    if request.method == 'GET':
-        return render_template("download.html")
     if request.method == 'POST':
         print('/opt/env/h/'+path+"/"+path2+"/"+filename)
         uploads = '/opt/env/h/'+path+"/"+path2+"/"+filename
